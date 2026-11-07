@@ -1,0 +1,55 @@
+{
+  "version": 1,
+  "updated": "2026-11-06",
+  "description": "Baza de termeni interziși pentru AI Finder. Termenii din 'global' se aplică în orice limbă. Termenii din 'languages.<cod>' se aplică DOAR când textul e în limba respectivă (așa e permis 'cum' în română, dar interzis în engleză).",
+
+  "global": [
+    "porn", "porno", "xxx", "nsfw", "hentai", "bdsm", "bukkake", "gangbang", "creampie", "cumshot", "cumshots",
+    "blowjob", "handjob", "deepthroat", "dildo", "milf", "camgirl", "camgirls", "onlyfans", "chaturbate",
+    "pornhub", "xvideos", "xnxx", "xhamster", "redtube", "youporn", "spankbang", "livejasmin", "stripchat"
+  ],
+
+  "languages": {
+    "en": {
+      "terms": [
+        "cum", "pornography", "pornographic", "erotic", "erotica", "fetish", "orgasm", "orgasms", "ejaculate", "ejaculation",
+        "masturbate", "masturbation", "pussy", "threesome", "orgy", "nudes", "snuff"
+      ],
+      "phrases": [
+        "sex tape", "sex video", "sex videos", "anal sex", "oral sex", "sex position", "sex positions", "sex act", "sex acts",
+        "incest porn", "snuff film", "gore video", "gore videos", "gore footage", "beheading video", "beheading videos",
+        "decapitation video", "mutilation video"
+      ],
+      "allowPhrases": [
+        "cum laude", "magna cum laude", "summa cum laude", "cum dividend", "cum rights", "cum grano salis", "snuff tobacco"
+      ]
+    },
+    "ro": {
+      "terms": [
+        "pornografie", "pornografic", "pornografica", "masturbare", "ejaculare", "orgasm", "orgasme", "muie", "pizda", "futai",
+        "fute", "futut", "curva", "snuff"
+      ],
+      "phrases": [
+        "filme porno", "filme gore", "videoclipuri gore", "sex oral", "sex anal", "clipuri porno", "sex explicit",
+        "videoclipuri cu decapitari", "film snuff"
+      ],
+      "allowPhrases": []
+    }
+  },
+
+  "domains": [
+    "pornhub.com", "xvideos.com", "xnxx.com", "xhamster.com", "redtube.com", "youporn.com", "spankbang.com",
+    "onlyfans.com", "chaturbate.com", "stripchat.com", "livejasmin.com", "e-hentai.org", "nhentai.net",
+    "rule34.xxx", "motherless.com", "liveleak.com", "bestgore.com", "kaotic.com", "theync.com", "goregrish.com"
+  ],
+
+  "urlPatterns": [
+    "^https?://en\\.wikipedia\\.org/wiki/(cum|semen|ejaculation|orgasm|masturbation|pornography|sexual_intercourse|oral_sex|anal_sex|sex_position)(?:[_#?/]|$)"
+  ],
+
+  "allow": {
+    "ro": [],
+    "en": [],
+    "global": []
+  }
+}

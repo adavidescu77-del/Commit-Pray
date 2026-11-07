@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  :root {
+    color-scheme: dark;
+    --bg:#08080a; --fg:#f4f4f6; --muted:#9a9aa6; --card:#121216; --field:#1a1a20;
+    --border:#2b2b34; --mark:#ffb81c; --mark-fg:#1a1200; --deep:#2b8cff; --danger:#ff4d5e;
+    --r:10px;
+  }
+  * { box-sizing:border-box; }
+  body { margin:0; padding:16px 14px 28px; font:14px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif; background:var(--bg); color:var(--fg); }
+  :focus-visible { outline:2px solid var(--mark); outline-offset:2px; }
+
+  header { display:flex; align-items:baseline; gap:8px; margin-bottom:16px; }
+  h1 { margin:0; font:italic 800 22px/1.1 system-ui,-apple-system,"Segoe UI",sans-serif; letter-spacing:-.01em; }
+  h1 .b { color:var(--mark); } h1 .a { color:var(--deep); }
+  .brand { width:30px; height:30px; flex:0 0 auto; border-radius:8px; }
+  .hero { display:block; width:100%; max-width:230px; margin:0 auto 14px; }
+
+  label { display:block; font-size:12px; font-weight:600; color:var(--muted); margin:0 0 4px; }
+  textarea, input, select {
+    width:100%; padding:9px 10px; border-radius:var(--r); border:1px solid var(--border);
+    background:var(--field); color:var(--fg); font:inherit;
+  }
+  textarea { min-height:84px; resize:vertical; }
+  textarea:focus, input:focus, select:focus { border-color:var(--fg); outline:none; box-shadow:0 0 0 3px color-mix(in srgb, var(--mark) 55%, transparent); }
+  #mode { margin-bottom:10px; font-weight:500; }
+
+  .row { display:flex; gap:8px; margin-top:8px; }
+  button {
+    padding:9px 12px; border-radius:var(--r); border:1px solid var(--border); background:var(--card);
+    color:var(--fg); cursor:pointer; font:inherit; font-weight:500; transition:background .15s, transform .05s;
+  }
+  button:hover:not(:disabled) { background:var(--field); }
+  button:active:not(:disabled) { transform:translateY(1px); }
+  button:disabled { opacity:.55; cursor:wait; }
+  button.primary { flex:1; font-weight:600; }
+  #go { background:var(--mark); border-color:var(--mark); color:var(--mark-fg); }
+  #go:hover:not(:disabled) { background:var(--mark); filter:brightness(.95); }
+  #stop { border-color:var(--danger); color:var(--danger); }
+
+  #status { margin-top:10px; min-height:18px; color:var(--muted); font-size:12px; }
+  #status:empty { display:none; }
+
+  #out { display:none; margin-top:12px; padding:12px 14px; background:var(--card); border:1px solid var(--border); border-left:4px solid var(--mark); border-radius:var(--r); white-space:pre-wrap; overflow-wrap:anywhere; max-width:68ch; }
+  #out.sum { white-space:normal; }
+  .sum-title { font-size:12px; font-weight:600; color:var(--muted); text-transform:uppercase; letter-spacing:.04em; }
+  .sum-pick { display:flex; align-items:center; gap:8px; margin-top:6px; font-size:16px; font-weight:600; }
+  .sum-line { margin-top:4px; font-size:13px; color:var(--muted); }
+  #out.warn { border-left-color:var(--danger); font-weight:600; }
+
+  #links { margin-top:10px; font-size:13px; }
+  #links a { padding:7px 10px; background:var(--card); border:1px solid var(--border); border-radius:8px; text-decoration:none; color:var(--fg); overflow-wrap:anywhere; }
+  #links a:hover { border-color:var(--fg); }
+
+  details { margin-top:22px; border-top:1px solid var(--border); padding-top:12px; }
+  summary { cursor:pointer; font-weight:600; color:var(--muted); list-style:none; display:flex; align-items:center; gap:6px; }
+  summary::-webkit-details-marker { display:none; }
+  summary::before { content:"▸"; font-size:11px; transition:transform .15s; }
+  details[open] > summary::before { transform:rotate(90deg); }
+  #dirty { color:var(--danger); font-weight:600; font-size:12px; }
+
+  .group { margin-top:16px; padding:12px; background:var(--card); border:1px solid var(--border); border-radius:var(--r); }
+  .group h2 { margin:0 0 10px; font-size:13px; font-weight:600; }
+  .group > * + * { margin-top:8px; }
+  .group button { width:100%; }
+  .help { font-size:12px; color:var(--muted); }
+
+  .source-item { display:flex; align-items:center; justify-content:space-between; gap:8px; padding:6px 10px; background:var(--field); border:1px solid var(--border); border-radius:8px; font-size:13px; }
+  .source-item button { width:auto; padding:2px 8px; font-size:12px; border-radius:6px; }
+  #sourceList { list-style:none; padding:0; margin:8px 0 0; display:flex; flex-direction:column; gap:4px; }
+
+  #save { width:100%; margin-top:16px; background:var(--deep); color:#fff; border-color:var(--deep); font-weight:600; }
+  #save:hover:not(:disabled) { background:var(--deep); filter:brightness(1.1); }
+  a { color:var(--deep); }
+
+  @media (prefers-reduced-motion: reduce) { * { transition:none !important; } }
+
+  .topbar { display:flex; align-items:center; gap:8px; margin-bottom:14px; }
+  .topbar h1 { flex:1; }
+  .topbar button { padding:5px 10px; font-size:13px; }
+  .view { display:none; }
+  .view.active { display:block; }
+  .menu { display:flex; flex-direction:column; gap:6px; }
+  .menu button { display:flex; justify-content:space-between; align-items:center; text-align:left; width:100%; padding:12px; }
+  .menu small { display:block; font-weight:400; color:var(--muted); font-size:12px; }
+  .menu button::after { content:"›"; color:var(--muted); font-size:18px; }
+  #summary { width:100%; margin-top:14px; text-align:left; font-size:12px; color:var(--muted); background:transparent; border-style:dashed; overflow-wrap:anywhere; }
+  .field { margin-bottom:12px; }
+  .inline { display:flex; gap:8px; }
+  .inline button { width:auto; flex:0 0 auto; }
+  #status { margin-top:0; margin-bottom:10px; }
+  #save, .save2 { margin-top:8px; }
+
+  #report { margin-top:12px; display:flex; flex-direction:column; gap:8px; }
+  .site { padding:12px 14px; background:var(--card); border:1px solid var(--border); border-radius:12px; }
+  .site-head { display:flex; align-items:center; gap:10px; }
+  .rank { flex:0 0 auto; width:24px; height:24px; border-radius:50%; background:var(--field); color:var(--muted); font-size:12px; font-weight:700; display:grid; place-items:center; }
+  .site-head a { flex:1; min-width:0; font-weight:600; overflow-wrap:anywhere; text-decoration:none; }
+  .site-head a:hover { text-decoration:underline; }
+  .score { font-size:12px; font-weight:700; padding:2px 9px; border-radius:999px; background:var(--field); }
+  .score.good { background:#16a34a; color:#fff; } .score.mid { background:var(--mark); color:var(--mark-fg); } .score.bad { background:var(--danger); color:#fff; }
+  .site-desc { margin:8px 0 0; font-size:13px; line-height:1.5; overflow-wrap:anywhere; }
+  .loc { margin-top:10px; font-size:12px; color:var(--muted); overflow-wrap:anywhere; }
+  .loc.warn { color:var(--danger); font-weight:600; }
+  .open-site { width:100%; margin-top:12px; padding:7px 10px; font-size:13px; }
+</style>
+</head>
+<body>
+  <div class="topbar">
+    <button id="back" type="button" style="display:none" aria-label="Înapoi">‹ Înapoi</button>
+    <img class="brand" src="icons/icon48.png" alt="">
+    <h1 id="topTitle"><span class="b">Bulls</span><span class="a">-Ai</span></h1>
+    <span id="dirty" style="display:none">● nesalvat</span>
+    <button id="openSettings" type="button" aria-label="Setări">⚙ Setări</button>
+  </div>
+  <div id="status" role="status" aria-live="polite"></div>
+
+  <!-- ECRAN PRINCIPAL -->
+  <section class="view active" data-view="main">
+    <img class="hero" src="icons/logo.png" alt="Bulls-Ai">
+    <div class="field">
+      <label for="q">Ce serviciu cauți?</label>
+    </div>
+    <textarea id="q" placeholder="ex: firmă de acoperișuri, instalator, zugrav"></textarea>
+    <div class="field" style="margin-top:8px">
+      <label for="loc">În ce zonă? (oraș sau județ)</label>
+      <input id="loc" placeholder="ex: Sibiu" autocomplete="off">
+    </div>
+    <div class="row">
+      <button id="go" class="primary" title="Verifică mai multe firme, din mai multe căutări">🔍 Caută</button>
+    </div>
+    <div class="row">
+      <button id="clear">Șterge sublinierea</button>
+    </div>
+    <div class="row">
+      <button id="stop" style="display:none">Oprește</button>
+    </div>
+    <div id="out"></div>
+    <div id="report"></div>
+    <div id="links"></div>
+    <button id="summary" type="button" title="Schimbă furnizorul sau modelul"></button>
+  </section>
+
+  <!-- MENIU SETĂRI -->
+  <section class="view" data-view="menu">
+    <div class="menu">
+      <button type="button" data-goto="ai">🤖 <span style="flex:1;margin-left:8px">AI și model<small>Furnizor, cheie API, model</small></span></button>
+      <button type="button" data-goto="search">🔎 <span style="flex:1;margin-left:8px">Căutare<small>Câte pagini bune, câte pagini maxim</small></span></button>
+      <button type="button" data-goto="lang">🌍 <span style="flex:1;margin-left:8px">Limbă și filtrare<small>Limba principală, termeni interziși</small></span></button>
+    </div>
+  </section>
+
+  <!-- AI ȘI MODEL -->
+  <section class="view" data-view="ai">
+    <div class="field"><label for="provider">Furnizor</label><select id="provider"></select></div>
+    <div class="field">
+      <label for="key">Cheie API</label>
+      <div class="inline">
+        <input id="key" type="password" placeholder="cheia API" autocomplete="off">
+        <button id="toggleKey" type="button">Arată</button>
+      </div>
+    </div>
+    <div class="field">
+      <label for="model">Model</label>
+      <select id="model"></select>
+    </div>
+    <button id="loadModels" type="button" style="width:100%">Reîmprospătează lista de modele</button>
+    <div id="hint" class="help" style="margin-top:8px"></div>
+    <button id="save" type="button">Salvează</button>
+  </section>
+
+  <!-- CĂUTARE -->
+  <section class="view" data-view="search">
+    <div class="field">
+      <label for="goodPages">Număr de pagini bune</label>
+      <select id="goodPages">
+        <option value="1">1 pagină bună</option>
+        <option value="2">2 pagini bune</option>
+        <option value="3">3 pagini bune (recomandat)</option>
+        <option value="5">5 pagini bune</option>
+        <option value="8">8 pagini bune</option>
+      </select>
+      <div class="help" style="margin-top:4px">O pagină e bună dacă îndeplinește toate criteriile obligatorii (locație, contact, despre noi). Căutarea se oprește imediat ce a găsit atâtea.</div>
+    </div>
+    <div class="field">
+      <label for="maxPages">Număr maxim de pagini verificate</label>
+      <select id="maxPages">
+        <option value="6">6 pagini (rapid)</option>
+        <option value="10">10 pagini</option>
+        <option value="12">12 pagini (recomandat)</option>
+        <option value="20">20 pagini</option>
+        <option value="30">30 de pagini (amănunțit, mai lent)</option>
+      </select>
+      <div class="help" style="margin-top:4px">După ce a verificat atâtea pagini, căutarea se oprește chiar dacă n-a găsit numărul dorit de pagini bune. Se salvează automat.</div>
+    </div>
+  </section>
+
+  <!-- LIMBĂ ȘI FILTRARE -->
+  <section class="view" data-view="lang">
+    <div class="field">
+      <label for="primaryLang">Limba ta principală</label>
+      <select id="primaryLang">
+        <option value="ro">Română</option>
+        <option value="en">English</option>
+      </select>
+      <div class="help" style="margin-top:4px">Folosită când limba unei căutări scurte nu poate fi stabilită. Se salvează automat.</div>
+    </div>
+    <div class="field">
+      <label for="termsUrl">Baza de termeni interziși (URL JSON, https)</label>
+      <input id="termsUrl" placeholder="https://raw.githubusercontent.com/.../prohibited_terms.json">
+    </div>
+    <button id="termsRefresh" type="button" style="width:100%">Actualizează baza de termeni</button>
+    <div id="termsInfo" class="help" style="margin-top:8px"></div>
+  </section>
+
+  <script src="sidepanel.js"></script>
+</body>
+</html>
